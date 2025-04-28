@@ -1,1 +1,2 @@
-# fitness-website
+FuelFlex - Your Ultimate Fitness Companion
+FuelFlex offers personalized workout plans tailored to your fitness level, goals, and lifestyle. Whether you're a beginner or a seasoned athlete, FuelFlex helps you stay motivated with dynamic routines, easy-to-follow videos, and smart timers — all designed to make your fitness journey powerful, fun, and effective. Get ready to transform your body and fuel your passion for fitness!
