@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EliteFit - Premium Workout App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Splash Screen Styles */
+        .splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #121212;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .splash-logo {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        .splash-logo svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .splash-text {
+            color: #ffd700;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.5s forwards;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            padding: 20px;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0.03) 90%);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        body.loaded .container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #ffd700;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ffd700;
+            font-size: 0.95rem;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            border-radius: 8px;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffd700'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
+            color: #121212;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(255, 215, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #ffdf00 0%, #e6b800 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(255, 215, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .workout-display {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #252525;
+            border-radius: 10px;
+            display: none;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+        }
+        
+        .exercise {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .exercise h3 {
+            margin-bottom: 15px;
+            color: #ffd700;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            margin-top: 15px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .timer {
+            font-size: 2rem;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #252525;
+            color: #ffd700;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .controls button {
+            flex: 1;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .current-exercise {
+            background-color: #333333;
+            border-left: 4px solid #ffd700;
+            transform: translateX(5px);
+        }
+        
+        .completed {
+            opacity: 0.6;
+            position: relative;
+        }
+        
+        .completed::after {
+            content: "✓";
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            color: #ffd700;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        /* Loading animation */
+        @keyframes shimmer {
+            0% { background-position: -468px 0 }
+            100% { background-position: 468px 0 }
+        }
+        
+        .shimmer {
+            background: linear-gradient(to right, #2a2a2a 8%, #333 18%, #2a2a2a 33%);
+            background-size: 800px 104px;
+            animation: shimmer 1.5s infinite linear;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .splash-logo {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .splash-text {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div class="splash" id="splash" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <div class="splash-logo">
+            <img src="./ccj.png" alt="FlexFuel" style="width: 100px; height: 100px;" />
+        </div>
+        <div class="splash-text" style="margin-top: 10px;"></div>
+    </div>
+    
+    
+    <div class="container">
+        <h1>FlexFuel</h1>
+        
+        <div class="form-group">
+            <label for="level">FITNESS LEVEL</label>
+            <select id="level">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="time">WORKOUT DURATION</label>
+            <select id="time">
+                <option value="5">5 minutes</option>
+                <option value="15">15 minutes</option>
+                <option value="30">30 minutes</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="type">WORKOUT TYPE</label>
+            <select id="type">
+                <option value="strength">Strength</option>
+                <option value="cardio">Cardio</option>
+                <option value="stretching">Stretching</option>
+                <option value="fullbody">Full-Body</option>
+            </select>
+        </div>
+        
+        <button onclick="generateWorkout()">GENERATE WORKOUT PLAN</button>
+        
+        <div id="workoutPlan" class="workout-display">
+            <h2 id="workoutTitle">FlexFuel</h2>
+            <div id="exercises"></div>
+            <div class="timer" id="countdown">00:30</div>
+            <div class="controls">
+                <button onclick="startWorkout()">START</button>
+                <button onclick="pauseWorkout()">PAUSE</button>
+                <button onclick="resetWorkout()">RESET</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show splash screen first
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('splash').style.display = 'none';
+                    document.body.classList.add('loaded');
+                }, 500);
+            }, 2000); // Show splash for 2 seconds
+        });
+
+        // Workout Database with YouTube video IDs
+        const workouts = {
+            beginner: {
+                strength: [
+                    { name: "Push-ups", reps: "10 reps", video: "IODxDxX7oi4" },
+                    { name: "Bodyweight Squats", reps: "12 reps", video: "aclHkVaku9U" },
+                    { name: "Plank", reps: "30 seconds", video: "pSHjTRCQxIw" }
+                ],
+                cardio: [
+                    { name: "Jumping Jacks", reps: "30 seconds", video: "iSSAk4XCsRA" },
+                    { name: "High Knees", reps: "30 seconds", video: "oDdkytliOqE" },
+                    { name: "Butt Kicks", reps: "30 seconds", video: "vXVPvY1ulLY" }
+                ],
+                stretching: [
+                    { name: "Neck Stretch", reps: "30 seconds", video: "Qm5K74eyFyY" },
+                    { name: "Shoulder Stretch", reps: "30 seconds", video: "B-bt0g1Jn6Q" },
+                    { name: "Hamstring Stretch", reps: "30 seconds", video: "FSSDLDhbacc" }
+                ],
+                fullbody: [
+                    { name: "Squats", reps: "10 reps", video: "aclHkVaku9U" },
+                    { name: "Push-ups", reps: "8 reps", video: "IODxDxX7oi4" },
+                    { name: "Lunges", reps: "5 each leg", video: "QOVaHwm-Q6U" }
+                ]
+            },
+            intermediate: {
+                strength: [
+                    { name: "Push-ups", reps: "15 reps", video: "IODxDxX7oi4" },
+                    { name: "Dips", reps: "10 reps", video: "0326dyZYtPw" },
+                    { name: "Pull-ups", reps: "5 reps", video: "eGo4IYlbE5g" }
+                ],
+                cardio: [
+                    { name: "Burpees", reps: "10 reps", video: "qLBImHhCsw0" },
+                    { name: "Mountain Climbers", reps: "30 seconds", video: "nmwgirgXLYM" },
+                    { name: "Jump Rope", reps: "1 minute", video: "1BZM2Vre5oc" }
+                ],
+                stretching: [
+                    { name: "Cobra Stretch", reps: "30 seconds", video: "JDcdhTuycOI" },
+                    { name: "Quad Stretch", reps: "30 seconds", video: "K5I9K8Kyt0A" },
+                    { name: "Child's Pose", reps: "30 seconds", video: "2MJGg-dUKh0" }
+                ],
+                fullbody: [
+                    { name: "Burpees", reps: "10 reps", video: "qLBImHhCsw0" },
+                    { name: "Squat Jumps", reps: "12 reps", video: "U4WQyD6F9WY" },
+                    { name: "Plank to Push-up", reps: "8 reps", video: "CqWzG9clqOo" }
+                ]
+            },
+            advanced: {
+                strength: [
+                    { name: "Pull-ups", reps: "10 reps", video: "eGo4IYlbE5g" },
+                    { name: "Dips", reps: "15 reps", video: "0326dyZYtPw" },
+                    { name: "Handstand Push-ups", reps: "5 reps", video: "Mpfr9qnAN1Y" }
+                ],
+                cardio: [
+                    { name: "Sprint Intervals", reps: "30 sec on, 30 sec off", video: "H8I_kY2AK8k" },
+                    { name: "Box Jumps", reps: "10 reps", video: "GZq3q2dQ0tQ" },
+                    { name: "Battle Ropes", reps: "30 seconds", video: "S3Q9W4pzfQ8" }
+                ],
+                stretching: [
+                    { name: "Pigeon Pose", reps: "30 seconds", video: "v7AYKMP6rOE" },
+                    { name: "Lizard Pose", reps: "30 seconds", video: "w3eYxX8VgiU" },
+                    { name: "Downward Dog", reps: "30 seconds", video: "Fo1b1XxzQ8I" }
+                ],
+                fullbody: [
+                    { name: "Muscle-ups", reps: "5 reps", video: "4aVy3X7mWZ0" },
+                    { name: "Pistol Squats", reps: "5 each leg", video: "Ek8cn7kCRaI" },
+                    { name: "Dragon Flags", reps: "5 reps", video: "eZvyA1lR-U8" }
+                ]
+            }
+        };
+        
+        // Timer Variables
+        let timer;
+        let currentExercise = 0;
+        let timeLeft = 30;
+        let workoutExercises = [];
+        let isWorkoutRunning = false;
+        
+        // Generate Workout
+        function generateWorkout() {
+            const level = document.getElementById("level").value;
+            const time = parseInt(document.getElementById("time").value);
+            const type = document.getElementById("type").value;
+            
+            // Get base exercises
+            let exercises = [...workouts[level][type]];
+            
+            // Adjust repetitions based on time
+            const repsMultiplier = Math.ceil(time / 5);
+            exercises = exercises.map(ex => {
+                const newReps = ex.reps.replace(/\d+/, match => parseInt(match) * repsMultiplier);
+                return { ...ex, reps: newReps };
+            });
+            
+            workoutExercises = exercises;
+            
+            // Display Workout
+            const workoutPlan = document.getElementById("workoutPlan");
+            workoutPlan.style.display = "block";
+            workoutPlan.classList.add("shimmer");
+            
+            const exercisesContainer = document.getElementById("exercises");
+            exercisesContainer.innerHTML = "";
+            
+            setTimeout(() => {
+                workoutPlan.classList.remove("shimmer");
+                
+                workoutExercises.forEach((ex, index) => {
+                    const exerciseDiv = document.createElement("div");
+                    exerciseDiv.className = "exercise";
+                    exerciseDiv.id = `exercise-${index}`;
+                    exerciseDiv.innerHTML = `
+                        <h3>${index + 1}. ${ex.name} (${ex.reps})</h3>
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/${ex.video}?rel=0&modestbranding=1" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen></iframe>
+                        </div>
+                    `;
+                    exercisesContainer.appendChild(exerciseDiv);
+                });
+                
+                resetWorkout();
+            }, 800);
+        }
+        
+        // Timer Functions
+        function startWorkout() {
+            if (isWorkoutRunning) return;
+            
+            isWorkoutRunning = true;
+            highlightCurrentExercise();
+            
+            if (timer) clearInterval(timer);
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    markExerciseComplete();
+                    currentExercise++;
+                    
+                    if (currentExercise >= workoutExercises.length) {
+                        clearInterval(timer);
+                        setTimeout(() => {
+                            alert("Workout complete! Excellent performance! 🏆");
+                        }, 300);
+                        resetWorkout();
+                    } else {
+                        timeLeft = 30;
+                        highlightCurrentExercise();
+                        updateTimerDisplay();
+                    }
+                }
+            }, 1000);
+        }
+        
+        function pauseWorkout() {
+            isWorkoutRunning = false;
+            clearInterval(timer);
+        }
+        
+        function resetWorkout() {
+            clearInterval(timer);
+            isWorkoutRunning = false;
+            currentExercise = 0;
+            timeLeft = 30;
+            updateTimerDisplay();
+            
+            // Reset all exercise highlights
+            document.querySelectorAll('.exercise').forEach(ex => {
+                ex.classList.remove('current-exercise', 'completed');
+            });
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById("countdown").textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+            // Pulse animation when time is low
+            if (timeLeft <= 5) {
+                const timerElement = document.getElementById("countdown");
+                timerElement.style.animation = "none";
+                void timerElement.offsetWidth; // Trigger reflow
+                timerElement.style.animation = "pulse 0.5s infinite";
+            }
+        }
+        
+        function highlightCurrentExercise() {
+            document.querySelectorAll('.exercise').forEach(ex => {
+                ex.classList.remove('current-exercise');
+            });
+            
+            const currentExElement = document.getElementById(`exercise-${currentExercise}`);
+            if (currentExElement) {
+                currentExElement.classList.add('current-exercise');
+                
+                // Scroll to the current exercise
+                currentExElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        function markExerciseComplete() {
+            const completedExElement = document.getElementById(`exercise-${currentExercise}`);
+            if (completedExElement) {
+                completedExElement.classList.remove('current-exercise');
+                completedExElement.classList.add('completed');
+            }
+        }
+    </script>
+</body>
+</html>
